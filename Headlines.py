@@ -13,15 +13,6 @@ def get_news(publication):
     feed = feedparser.parse(SS_FEEDS[publication])
     all_article = feed['entries']
     return render_template('newsfeed.html',all_article=all_article)
-    # return """<html>
-    #     <body>
-    #         <h1>  Headlines </h1>
-    #         <b>{0}</b> <br/>
-    #         <i>{1}</i> <br/>
-    #         <p>{2}</p> <br/>
-    #     </body>
-    # </html>""".format(first_article.get("title"), first_article.get("published"), first_article.get("summary"))
-
 
 
 
