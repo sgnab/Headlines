@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Headlines</title>
+</head>
+<body>
+
+<div>
+{% for article in all_article %}
+
+
+    <div>
+
+        <h3><p> {{article.title}}</p></h3>
+         <p> {{article.published}}</p>
+         <p> {{article.summary}}</p>
+    </div>
+
+    {% endfor%}
+</div>
+
+</body>
+</html>
