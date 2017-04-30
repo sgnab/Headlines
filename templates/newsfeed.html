@@ -7,14 +7,20 @@
 <body>
 
 <div>
+    <div>
+        <form method="GET">
+  <input type="text" name="publication" placeholder="search" />
+  <input type="submit" value="Submit" />
+</form>
+    </div>
 {% for article in all_article %}
 
 
     <div>
 
-        <h3><p> {{article.title}}</p></h3>
+        <h3><p> {{article.title}}</p></h3><br/>
          <p> {{article.published}}</p>
-         <p> {{article.summary}}</p>
+        <p> {{article.summary}}</p><hr/>
     </div>
 
     {% endfor%}
