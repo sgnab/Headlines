@@ -34,8 +34,9 @@ def main_mathod():
         city=default['city']
     else:
         city=query2.lower()
-    # Parsing the data extracted from RSS feeds into dictionaries
+    # calling news method
     all_article=get_news(publication)
+    #calling weather method
     weather = get_weather(city)
 
     return render_template('newsfeed.html', all_article=all_article,weather=weather)
@@ -47,17 +48,14 @@ def get_weather(query):
     query = urllib.quote(query)
     url = api_url.format(query)
     data = urllib2.urlopen(url).read()
-
-    # data=data.content
     parsed = json.loads(data)
-
     weather = None
     if parsed.get("weather"):
         weather = {"description": parsed["weather"][0]["description"], "temperature": parsed["main"]["temp"],
                    "city": parsed["name"]
                    }
     return weather
-
+# a method to extract an parse the data from RSS feeds
 def get_news(publication):
     feed = feedparser.parse(SS_FEEDS[publication])
     all_article = feed['entries']
