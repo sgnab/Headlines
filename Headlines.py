@@ -1,6 +1,6 @@
-from flask import Flask,redirect,render_template,request,session
+from flask import Flask,redirect,render_template,request,session,make_response
 import feedparser
-import urllib2,urllib,requests
+import urllib2,urllib,requests,datetime
 import json
 
 
@@ -20,7 +20,7 @@ default={"city":"London","publication":"bbc"}
 
 # main page
 @app.route("/",methods=["GET","POST"])
-def get_news():
+def home():
     # a get request by user to be extracted from Html form
     query = request.args.get('publication')
     if not query or query.lower() not in SS_FEEDS:
