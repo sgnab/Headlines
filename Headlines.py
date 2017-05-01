@@ -12,24 +12,31 @@ SS_FEEDS = {"voa":'http://ir.voanews.com/api/zuiypepjy_',
              'cnn': 'http://rss.cnn.com/rss/edition.rss',
              'fox': 'http://feeds.foxnews.com/foxnews/latest',
              'iol': 'http://www.iol.co.za/cmlink/1.640'}
+
+default={"city":"London","publication":"bbc"}
 @app.route("/",methods=["GET","POST"])
 def get_news():
     query = request.args.get('publication')
     if not query or query.lower() not in SS_FEEDS:
-        publication = 'bbc'
+        publication = default['publication']
 
     else:
         publication = query.lower()
+    query2=request.args.get('city')
+    if not query2:
+        city=default['city']
+    else:
+        city=query2.lower()
 
     feed = feedparser.parse(SS_FEEDS[publication])
-    weather = get_weather("London,UK")
+    weather = get_weather(city)
     all_article = feed['entries']
     return render_template('newsfeed.html', all_article=all_article,weather=weather)
 
 
 
 def get_weather(query):
-    api_url= 'http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid=0ce3d306b8843597c9305743ccb8e4d9'
+    api_url= 'http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid=API KEY'
     query = urllib.quote(query)
     url = api_url.format(query)
     data = urllib2.urlopen(url).read()
