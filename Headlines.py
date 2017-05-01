@@ -6,6 +6,8 @@ import json
 
 
 app=Flask(__name__)
+
+# sample of RSS Feeds
 SS_FEEDS = {"voa":'http://ir.voanews.com/api/zuiypepjy_',
     'bbcp':'http://feeds.bbci.co.uk/persian/rss.xml',
     'bbc': 'http://feeds.bbci.co.uk/news/rss.xml',
@@ -13,28 +15,33 @@ SS_FEEDS = {"voa":'http://ir.voanews.com/api/zuiypepjy_',
              'fox': 'http://feeds.foxnews.com/foxnews/latest',
              'iol': 'http://www.iol.co.za/cmlink/1.640'}
 
+# Default query values
 default={"city":"London","publication":"bbc"}
+
+# main page
 @app.route("/",methods=["GET","POST"])
 def get_news():
+    # a get request by user to be extracted from Html form
     query = request.args.get('publication')
     if not query or query.lower() not in SS_FEEDS:
         publication = default['publication']
 
     else:
         publication = query.lower()
+    # a get request by user to be extracted from Html form
     query2=request.args.get('city')
     if not query2:
         city=default['city']
     else:
         city=query2.lower()
-
+    # Parsing the data extracted from RSS feeds into dictionaries
     feed = feedparser.parse(SS_FEEDS[publication])
     weather = get_weather(city)
     all_article = feed['entries']
     return render_template('newsfeed.html', all_article=all_article,weather=weather)
 
 
-
+# a method to get the weather infos from Openweathermap using API keys
 def get_weather(query):
     api_url= 'http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid=API KEY'
     query = urllib.quote(query)
@@ -53,7 +60,7 @@ if __name__=="__main__":
     app.run(debug=True)
 
 
-
+######On ecan use the following method to use Post request instead of Get request for RSS exctarction
 
  # if request.method=="POST":
  #        query=request.form['publication']
