@@ -53,7 +53,7 @@ def main_mathod():
 
 # a method to get the weather infos from Openweathermap using API keys
 def get_weather(query):
-    api_url= 'http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid=0ce3d306b8843597c9305743ccb8e4d9'
+    api_url= 'http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid=Your API HERE'
     query = urllib.quote(query)
     url = api_url.format(query)
     data = urllib2.urlopen(url).read()
@@ -71,7 +71,7 @@ def get_news(publication):
     return all_article
 
 def currency_conversion(curr_from,curr_to):
-    curr_url = "https://openexchangerates.org//api/latest.json?app_id=7d92caed59234f05b12717523885adc3"
+    curr_url = "https://openexchangerates.org//api/latest.json?app_id=Your API HERE"
     all_currs=urllib2.urlopen(curr_url).read()
     data=json.loads(all_currs).get("rates")
     f_rate=data.get(curr_from.upper())
