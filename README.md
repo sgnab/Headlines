@@ -1,2 +1,2 @@
 # Headlines
-This a very simple Flask appliation in using RSS feeds and different type of APIs
+A simple  appliation based on Flask Micro framework. This application shows how to use RSS feeds and different type of APIs in Flask.
