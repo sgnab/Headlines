@@ -78,12 +78,14 @@ def currency_conversion(curr_from,curr_to):
     to_rate=data.get(curr_to.upper())
     return (to_rate/f_rate,data.keys())
 
-def query_handler(query):
+def query_handler(form_input):
+    query = request.args.get(form_input)
     if not query:
-        query=request.cookies.get(query)
+        query= request.cookies.get(form_input)
+        return query
         if not query:
-            query=default[query]
-    query=request.args.get(query)
+            return default[form_input]
+
     return query
 
 
