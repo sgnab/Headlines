@@ -13,33 +13,42 @@ SS_FEEDS = {"voa":'http://ir.voanews.com/api/zuiypepjy_',
     'bbc': 'http://feeds.bbci.co.uk/news/rss.xml',
              'cnn': 'http://rss.cnn.com/rss/edition.rss',
              'fox': 'http://feeds.foxnews.com/foxnews/latest',
-             'iol': 'http://www.iol.co.za/cmlink/1.640'}
+             'iol': 'http://www.iol.co.za/cmlink/1.640'
+            }
 
 # Default query values
-default={"city":"London","publication":"bbc"}
+default={"city":"London","publication":"bbc",
+         'curr_from':"USD",
+            'curr_to': "GBP"}
 
 # main page
 @app.route("/",methods=["GET","POST"])
 def main_mathod():
     # a get request by user to be extracted from Html form
-    query = request.args.get('publication')
-    if not query or query.lower() not in SS_FEEDS:
-        publication = default['publication']
+    publication=query_handler('publication')
+    all_article = get_news(publication)
 
-    else:
-        publication = query.lower()
-    # a get request by user to be extracted from Html form
-    query2=request.args.get('city')
-    if not query2:
-        city=default['city']
-    else:
-        city=query2.lower()
-    # calling news method
-    all_article=get_news(publication)
-    #calling weather method
+
+    #extracting weather data
+    city=query_handler('city')
     weather = get_weather(city)
 
-    return render_template('newsfeed.html', all_article=all_article,weather=weather)
+    # Currency from and currency_to handling
+    curr_from=query_handler('curr_from')
+    curr_to=query_handler('curr_to')
+    #getting exchange rate
+    rate,currencies=currency_conversion(curr_from,curr_to)
+    # setting cookies
+    response=make_response(render_template('newsfeed.html', all_article=all_article,weather=weather,
+                                           curr_from=curr_from,curr_to=curr_to,rate=rate,currencies=sorted(currencies))
+                                                      )
+    expires=datetime.datetime.now()+datetime.timedelta(days=365)
+    response.set_cookie('publication',publication,expires=expires)
+    response.set_cookie('city',city,expires=expires)
+    response.set_cookie('curr_from',curr_from,expires=expires)
+    response.set_cookie('curr_to',curr_to,expires=expires)
+    return response
+
 
 
 # a method to get the weather infos from Openweathermap using API keys
@@ -52,8 +61,8 @@ def get_weather(query):
     weather = None
     if parsed.get("weather"):
         weather = {"description": parsed["weather"][0]["description"], "temperature": parsed["main"]["temp"],
-                   "city": parsed["name"]
-                   }
+                   "city": parsed["name"],
+                   'country': parsed['sys']['country']}
     return weather
 # a method to extract an parse the data from RSS feeds
 def get_news(publication):
@@ -61,24 +70,24 @@ def get_news(publication):
     all_article = feed['entries']
     return all_article
 
+def currency_conversion(curr_from,curr_to):
+    curr_url = "https://openexchangerates.org//api/latest.json?app_id=7d92caed59234f05b12717523885adc3"
+    all_currs=urllib2.urlopen(curr_url).read()
+    data=json.loads(all_currs).get("rates")
+    f_rate=data.get(curr_from.upper())
+    to_rate=data.get(curr_to.upper())
+    return (to_rate/f_rate,data.keys())
+
+def query_handler(query):
+    if not query:
+        query=request.cookies.get(query)
+        if not query:
+            query=default[query]
+    query=request.args.get(query)
+    return query
+
+
 if __name__=="__main__":
     app.run(debug=True)
 
 
-######On ecan use the following method to use Post request instead of Get request for RSS exctarction
-
- # if request.method=="POST":
- #        query=request.form['publication']
- #        if query.lower() not in SS_FEEDS:
- #            publication='cnn'
- #        else:
- #            publication=query.lower()
- #        feed = feedparser.parse(SS_FEEDS[publication])
- #        all_article = feed['entries']
- #        return render_template('newsfeed.html', all_article=all_article)
- #    publication='cnn'
- #    feed = feedparser.parse(SS_FEEDS[publication])
- #    all_article = feed['entries']
- #    return render_template('newsfeed.html', all_article=all_article)
- #
- #
