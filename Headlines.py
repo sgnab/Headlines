@@ -20,7 +20,7 @@ default={"city":"London","publication":"bbc"}
 
 # main page
 @app.route("/",methods=["GET","POST"])
-def home():
+def main_mathod():
     # a get request by user to be extracted from Html form
     query = request.args.get('publication')
     if not query or query.lower() not in SS_FEEDS:
@@ -35,19 +35,22 @@ def home():
     else:
         city=query2.lower()
     # Parsing the data extracted from RSS feeds into dictionaries
-    feed = feedparser.parse(SS_FEEDS[publication])
+    all_article=get_news(publication)
     weather = get_weather(city)
-    all_article = feed['entries']
+
     return render_template('newsfeed.html', all_article=all_article,weather=weather)
 
 
 # a method to get the weather infos from Openweathermap using API keys
 def get_weather(query):
-    api_url= 'http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid=API KEY'
+    api_url= 'http://api.openweathermap.org/data/2.5/weather?q={}&units=metric&appid=0ce3d306b8843597c9305743ccb8e4d9'
     query = urllib.quote(query)
     url = api_url.format(query)
     data = urllib2.urlopen(url).read()
+
+    # data=data.content
     parsed = json.loads(data)
+
     weather = None
     if parsed.get("weather"):
         weather = {"description": parsed["weather"][0]["description"], "temperature": parsed["main"]["temp"],
@@ -55,6 +58,10 @@ def get_weather(query):
                    }
     return weather
 
+def get_news(publication):
+    feed = feedparser.parse(SS_FEEDS[publication])
+    all_article = feed['entries']
+    return all_article
 
 if __name__=="__main__":
     app.run(debug=True)
